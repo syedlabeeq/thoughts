@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crystal Sheet Interface</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: url('./images/bg3.webp') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @font-face {
+            font-family: "Mehr Nastaliq";
+            src: url("./fonts/Mehr_Nastaliq_Web.woff") format("woff");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        .glass-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 1rem 0.5rem 1rem;
+            width: 90%;
+            height: 90vh;
+        }
+
+        /* TITLE HEADING STYLE */
+        #titleHeading {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            color: rgb(136, 77, 77);
+            border: solid 2px rgba(255, 255, 255, 0.3);
+            background-color: rgb(225, 160 , 160);
+            padding: 15px 5px;
+            border-radius: 50px;
+        }
+
+        #textContent {
+            flex-grow: 1;
+            overflow-y: auto;
+            font-size: 1rem;
+            line-height: 1.7;
+            padding-right: 10px;
+            direction: rtl;
+            font-family: 'Mehr Nastaliq';
+            text-align: justify; /* Added for symmetrical text */
+            color:#60053c;
+        }
+
+        #textContent::-webkit-scrollbar { width: 5px; }
+        #textContent::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+
+        #dateDisplay {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 1rem;
+            opacity: 0.8;
+        }
+
+        .navigation-buttons {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #status {
+            text-align: center;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="glass-container">
+
+    <!-- TITLE (dynamic heading) -->
+    <h3 id="titleHeading"></h3>
+
+    <!-- TEXT -->
+    <div id="textContent"></div>
+
+    <!-- DATE AFTER TEXT -->
+    <div id="dateDisplay"></div>
+
+    <!-- BUTTONS AT BOTTOM -->
+    <div class="navigation-buttons">
+        <button id="prevBtn" class="btn btn-outline-light btn-sm" onclick="prevSection()" disabled>
+            ← Back
+        </button>
+        <button id="nextBtn" class="btn btn-info btn-sm text-white" onclick="nextSection()" disabled>
+            Next →
+        </button>
+    </div>
+
+    <div id="status">Load a sheet to begin.</div>
+
+</div>
+
+<!-- Modal for Sheet Input -->
+<div class="modal fade" id="sheetModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enter Google Sheet 5-character code</h5>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="sheetUrl" class="form-control" placeholder="Enter 5 characters...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info text-white fw-bold" onclick="fetchContent()">Load Sheet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let rowsData = [];
+let currentIndex = 0;
+let sheetModal;
+
+document.addEventListener("DOMContentLoaded", function() {
+    sheetModal = new bootstrap.Modal(document.getElementById('sheetModal'));
+    sheetModal.show();
+});
+
+function fetchContent() {
+    const input = document.getElementById("sheetUrl").value.trim();
+    const status = document.getElementById("status");
+
+    if (input.length !== 5) {
+        alert("Please enter exactly 5 characters.");
+        return;
+    }
+
+    // Hardcoded prefix and suffix
+    const PREFIX = "1hSk_R3m";
+    const SUFFIX = "3Uk8xZ7XRZCxw0tLwvXH2B2OuRayE3c";
+    const SHEET_ID = PREFIX + input + SUFFIX;
+
+    status.innerText = "Loading sheet data...";
+
+    const oldScript = document.getElementById("sheetScript");
+    if (oldScript) oldScript.remove();
+
+    const script = document.createElement("script");
+    script.id = "sheetScript";
+    script.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=responseHandler:handleSheetResponse`;
+    document.body.appendChild(script);
+
+    sheetModal.hide();
+}
+
+function handleSheetResponse(response) {
+    const status = document.getElementById("status");
+
+    if (!response.table || !response.table.rows) {
+        status.innerText = "No data found or sheet is private.";
+        return;
+    }
+
+    rowsData = response.table.rows.slice(1); // skip header
+    currentIndex = 0;
+
+    if (rowsData.length === 0) {
+        status.innerText = "Sheet is empty.";
+        return;
+    }
+
+    status.innerText = `Loaded ${rowsData.length} entries.`;
+    showSection(0);
+}
+
+function showSection(index) {
+    const row = rowsData[index];
+
+    const title = row.c[1] ? row.c[1].v : "";
+    const text = row.c[2] ? row.c[2].v : "";
+    const dateRaw = row.c[0] ? row.c[0].v : "";
+
+    // Format date nicely
+    let formattedDate = "";
+    if (typeof dateRaw === "string" && dateRaw.startsWith("Date(")) {
+        const parts = dateRaw.match(/\d+/g);
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]); // already 0-based
+        const day = parseInt(parts[2]);
+        const realDate = new Date(year, month, day);
+        formattedDate = realDate.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+    } else {
+        formattedDate = dateRaw;
+    }
+
+    document.getElementById("titleHeading").innerText = title;
+    document.getElementById("textContent").innerText = text;
+    document.getElementById("dateDisplay").innerText = formattedDate;
+
+    currentIndex = index;
+    updateButtons();
+}
+
+function nextSection() {
+    if (currentIndex < rowsData.length - 1) {
+        showSection(currentIndex + 1);
+    }
+}
+
+function prevSection() {
+    if (currentIndex > 0) {
+        showSection(currentIndex - 1);
+    }
+}
+
+function updateButtons() {
+    document.getElementById('prevBtn').disabled = currentIndex === 0;
+    document.getElementById('nextBtn').disabled = currentIndex === rowsData.length - 1;
+}
+</script>
+
+</body>
+</html>

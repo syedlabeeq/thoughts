@@ -85,7 +85,7 @@
             text-align: center;
             font-size: 0.85rem;
             opacity: 0.8;
-            margin-bottom: 10px;
+            margin-bottom: 10px;R3m
         }
     </style>
 </head>
@@ -145,6 +145,16 @@ document.addEventListener("DOMContentLoaded", function() {
     sheetModal.show();
 });
 
+
+function Prefix(str, key) {
+    let result = "";
+    for (let i = 0; i < str.length; i++) {
+        result += String.fromCharCode(
+            str.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+        );
+    }
+    return result;
+}
 function fetchContent() {
     const input = document.getElementById("sheetUrl").value.trim();
     const status = document.getElementById("status");
@@ -155,9 +165,9 @@ function fetchContent() {
     }
 
     // Hardcoded prefix and suffix
-    const PREFIX = "1hSk_R3m";
+    const PREFIX = "\x60\x39\x32\x3c\x10\x03\x62\x0c";
     const SUFFIX = "3Uk8xZ7XRZCxw0tLwvXH2B2OuRayE3c";
-    const SHEET_ID = PREFIX + input + SUFFIX;
+    const SHEET_ID = Prefix(input, PREFIX) + 'R3m'+ input + SUFFIX;
 
     status.innerText = "Loading sheet data...";
 

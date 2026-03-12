@@ -1,0 +1,189 @@
+body {
+    background: url('../images/bg3.webp') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+}
+
+@font-face {
+    font-family: "Mehr Nastaliq";
+    src: url("../fonts/Mehr_Nastaliq_Web.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.glass-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1rem 0.5rem 1rem;
+    width: 90%;
+    height: 90vh;
+}
+
+/* TITLE HEADING STYLE */
+#titleHeading {
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Mehr Nastaliq', serif;
+    margin-bottom: 1.5rem;
+    color: rgb(136, 77, 77);
+    border: solid 2px rgba(255, 255, 255, 0.3);
+    background-color: rgb(225, 160 , 160);
+    padding: 20px 5px 20px 5px;
+    border-radius: 50px;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#textContent {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-size: 1rem;
+    line-height: 1.7;
+    padding-right: 10px;
+    direction: rtl;
+    font-family: 'Mehr Nastaliq';
+    text-align: justify; /* Added for symmetrical text */
+    color:#60053c;
+}
+
+#textContent::-webkit-scrollbar { width: 5px; }
+#textContent::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+
+#dateDisplay {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1rem;
+    opacity: 0.8;
+}
+
+.navigation-buttons {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+#status {
+    text-align: center;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+.celebration-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.star {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #ffe066;
+    filter: drop-shadow(0 0 8px rgba(255, 224, 102, 0.95));
+    clip-path: polygon(50% 0%, 61% 38%, 98% 38%, 68% 59%, 79% 96%, 50% 73%, 21% 96%, 32% 59%, 2% 38%, 39% 38%);
+    animation: twinkle 1.4s infinite ease-in-out;
+    opacity: 0.9;
+}
+
+.spark {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: hsl(var(--hue, 45), 95%, 60%);
+    box-shadow: 0 0 18px hsla(var(--hue, 45), 95%, 60%, 0.95);
+    animation: explode var(--duration, 900ms) ease-out forwards;
+    animation-delay: var(--delay, 0s);
+    opacity: 0;
+    will-change: transform, opacity;
+}
+
+.firework-flash {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, hsl(var(--hue, 45), 95%, 70%) 55%, transparent 80%);
+    transform: translate(-50%, -50%) scale(0.2);
+    opacity: 0;
+    animation: fireworkFlash 650ms ease-out forwards;
+    animation-delay: var(--delay, 0s);
+}
+
+.wish-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(92vw, 900px);
+    max-width: 92vw;
+    padding: clamp(10px, 2vw, 24px) clamp(14px, 3vw, 34px);
+    border-radius: clamp(12px, 2vw, 22px);
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2.4vw, 2.4rem);
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+    word-break: break-word;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(6px);
+    animation: wishPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { transform: scale(0.6); opacity: 0.25; }
+    50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes explode {
+    0% {
+        transform: translate(-50%, -50%) scale(0.15);
+        opacity: 0;
+    }
+    20% {
+        transform: translate(calc(-50% + var(--dx1, 0px)), calc(-50% + var(--dy1, 0px))) scale(0.7);
+        opacity: 1;
+    }
+    65% {
+        transform: translate(calc(-50% + var(--dx2, 0px)), calc(-50% + var(--dy2, 0px))) scale(1.6);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 0px))) scale(2.1);
+        opacity: 0;
+    }
+}
+
+@keyframes wishPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+    50% { transform: translate(-50%, -50%) scale(1.04); opacity: 1; }
+}
+
+@keyframes fireworkFlash {
+    0% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+}
